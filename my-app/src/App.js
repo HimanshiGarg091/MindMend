@@ -2,45 +2,55 @@ import React, { useState } from "react";
 import "./App.css";
 import ladyImage from './lady.jpg';
 import MoodTracker from "./MoodTracker";
-
-
 import TherapistForm from "./TherapistForm";
-
+import SignIn from "./SignIn";
+import SignUp from "./SignUp";
 
 function App() {
   const [showForm, setShowForm] = useState(false);
+  const [showMood, setShowMood] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [showTherapistReg, setShowTherapistReg] = useState(false);
+  const [showClientReg, setShowClientReg] = useState(false);
+  const [showSignUp, setShowSignUp] = useState(false);
+  const [signUpRole, setSignUpRole] = useState('Client');
 
   const openForm = () => setShowForm(true);
   const closeForm = () => setShowForm(false);
-
-  const [showMood, setShowMood] = useState(false);
   const openMood = () => setShowMood(true);
   const closeMood = () => setShowMood(false);
+  const handleSignIn = (userType) => {
+    setShowSignIn(false);
+    if (userType === "Therapist") {
+      setShowTherapistReg(true);
+    } else {
+      setShowClientReg(true);
+    }
+  };
+  const handleShowSignUp = () => {
+    setShowSignIn(false);
+    setShowSignUp(true);
+  };
 
   return (
-    <div className="full-width-section">z
-    {showForm && <TherapistForm onClose={closeForm} />}
-    {showMood && <MoodTracker onClose={closeMood} />}
-
+    <div className="full-width-section">
+      {showForm && <TherapistForm onClose={closeForm} />}
+      {showMood && <MoodTracker onClose={closeMood} />}
+      {showSignIn && <SignIn onSignIn={handleSignIn} onShowSignUp={handleShowSignUp} />}
+      {showSignUp && <SignUp onBack={() => { setShowSignUp(false); setShowSignIn(true); }} />}
       <nav className="navbar">
         <div className="logo">MindMend</div>
         <ul className="nav-links">
           <li>Home</li>
-          <li> <button className="nav-btn"
-            onClick={openForm} style={{ 
-              background:"none",
-              border:"none",
-              color:"#16203a",
-              frontSize:"1.1rem",
-              cursor:"pinter"}}>
-                Therapists
-              </button> </li>
-  
-
+          <li>
+            <button className="nav-btn" onClick={openForm} style={{ background: "none", border: "none", color: "#16203a", fontSize: "1.1rem", cursor: "pointer" }}>
+              Therapists
+            </button>
+          </li>
           <li>Resources</li>
           <li>Community</li>
         </ul>
-        <button className="sign-in-btn">Sign in</button>
+        <button className="sign-in-btn" onClick={() => setShowSignIn(true)}>Sign in</button>
       </nav>
       <header className="hero">
         <div className="hero-text">
