@@ -5,7 +5,7 @@ import MoodTracker from "./MoodTracker";
 import SelfHelpResources from './SelfHelpResources';
 import TherapistForm from "./TherapistForm";
 import Modal from './Modal.js';
-
+import CommunityChat from "./CommunityChat.js";
 
 function App() {
   const [showForm, setShowForm] = useState(false);
@@ -22,7 +22,9 @@ function App() {
   const openSelfHelp = () => setShowSelfHelp(true);
   const closeSelfHelp = () => setShowSelfHelp(false);
 
-
+  const [showCommunityChat, setShowCommunityChat] = useState(false);
+  const openCommunityChat = () => setShowCommunityChat(true);  
+  const closeCommunityChat = () => setShowCommunityChat(false);
 
   return (
     <div className="full-width-section">z
@@ -105,12 +107,24 @@ function App() {
 
 
 
-          <div className="feature-item">
-            <span role="img" aria-label="Community Support" className="icon">
-              👥
-            </span>
-            <p>CommunitySupportFeature</p>
-          </div>
+<div className="feature-item">
+  <span role="img" aria-label="Community Support" className="icon">
+    👥
+  </span>
+  <button
+    className="get-started-btn"
+    onClick={openCommunityChat}
+    style={{ marginTop: "10px" }}
+  >
+    Community Support
+  </button>
+  {showCommunityChat && (
+    <Modal onClose={closeCommunityChat}>
+      <h2>Community Chat</h2>
+      <CommunityChat />
+    </Modal>
+  )}
+</div>
 
         </div>
       </section>
