@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import "./App.css";
 import ladyImage from './lady.jpg';
 import MoodTracker from "./MoodTracker";
-
-
+import SelfHelpResources from './SelfHelpResources';
 import TherapistForm from "./TherapistForm";
+import Modal from './Modal.js';
 
 
 function App() {
@@ -17,10 +17,19 @@ function App() {
   const openMood = () => setShowMood(true);
   const closeMood = () => setShowMood(false);
 
+  const [showSelfHelp, setShowSelfHelp] = useState(false);
+
+  const openSelfHelp = () => setShowSelfHelp(true);
+  const closeSelfHelp = () => setShowSelfHelp(false);
+
+
+
   return (
     <div className="full-width-section">z
     {showForm && <TherapistForm onClose={closeForm} />}
     {showMood && <MoodTracker onClose={closeMood} />}
+    
+
 
       <nav className="navbar">
         <div className="logo">MindMend</div>
@@ -66,7 +75,7 @@ function App() {
             <span role="img" aria-label="Online Therapy" className="icon">
               💻
             </span>
-            <p>Online Therapy</p>
+            <p> <button className="get-started-btn" onClick={openForm}>Online Therapy</button></p>
           </div>
           <div className="feature-item">
             <span role="img" aria-label="Mood Tracking" className="icon">
@@ -76,18 +85,33 @@ function App() {
   Mood Tracking
 </button></p>
           </div>
+
           <div className="feature-item">
-            <span role="img" aria-label="Self-Help Resources" className="icon">
-              📖
-            </span>
-            <p>Self-Help Resources</p>
-          </div>
+  <span role="img" aria-label="Self-Help Resources" className="icon">
+    📖
+  </span>
+  <p>
+    <button className="get-started-btn" onClick={openSelfHelp}>
+      Self-Help Resources
+    </button>
+  </p>
+  {showSelfHelp && (
+    <Modal onClose={closeSelfHelp}>
+      <SelfHelpResources />
+    </Modal>
+  )}
+    
+</div>
+
+
+
           <div className="feature-item">
             <span role="img" aria-label="Community Support" className="icon">
               👥
             </span>
-            <p>Community Support</p>
+            <p>CommunitySupportFeature</p>
           </div>
+
         </div>
       </section>
     </div>
