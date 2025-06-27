@@ -8,6 +8,8 @@ import SelfHelpResources from "./SelfHelpResources";
 import CommunityChat from "./CommunityChat";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
+import Footer from "./Footer";
+
 
 function App() {
   const [showForm, setShowForm] = useState(false);
@@ -142,6 +144,7 @@ function App() {
 
         </div>
       </section>
+      <Footer />
     </div>
 
   );
