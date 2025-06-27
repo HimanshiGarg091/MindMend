@@ -1,280 +1,263 @@
 import React, { useState } from 'react';
-import './SignIn.css';
+import './Register.css';
 
-function getPasswordStrength(password) {
-  let strength = 0;
-  if (password.length >= 8) strength++;
-  if (/[A-Z]/.test(password)) strength++;
-  if (/[a-z]/.test(password)) strength++;
-  if (/[0-9]/.test(password)) strength++;
-  if (/[^A-Za-z0-9]/.test(password)) strength++;
-  return strength;
-}
+const defaultFields = {
+  user: 'client',
+  email: '',
+  pass: '',
+  confirm: '',
+  licenseId: '',
+  focusAreas: [],
+  experience: '',
+  institution: '',
+  credentialFile: null,
+  age: '',
+  language: '',
+  issues: [],
+  mode: ''
+};
 
-const expertiseOptions = [
-  'Anxiety',
-  'Depression',
-  'Relationship Issues',
-  'Stress Management',
-  'Trauma',
-  'Other'
-];
-const concernsOptions = [
-  'Anxiety',
-  'Depression',
-  'Stress',
-  'Relationship',
-  'Sleep',
-  'Self-Esteem',
-  'Other'
-];
-const communicationModes = [
-  'Chat',
-  'Video Call',
-  'In-Person'
-];
+const options = {
+  specialties: ['Anxiety', 'Depression', 'Relationship Issues', 'Stress Management', 'Trauma', 'Other'],
+  concerns: ['Anxiety', 'Depression', 'Stress', 'Relationship', 'Sleep', 'Self-Esteem', 'Other'],
+  modes: ['Chat', 'Video Call', 'In-Person']
+};
 
-const SignUp = ({ onBack }) => {
-  const [role, setRole] = useState('client');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  // Therapist fields
-  const [licenseNumber, setLicenseNumber] = useState('');
-  const [expertise, setExpertise] = useState([]);
-  const [yearsExperience, setYearsExperience] = useState('');
-  const [institution, setInstitution] = useState('');
-  const [credentials, setCredentials] = useState(null);
-  // Client fields
-  const [age, setAge] = useState('');
-  const [preferredLanguage, setPreferredLanguage] = useState('');
-  const [concerns, setConcerns] = useState([]);
-  const [communicationMode, setCommunicationMode] = useState('');
-  // UI
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [passwordStrength, setPasswordStrength] = useState(0);
+const RegisterForm = ({ onSwitch }) => {
+  const [form, setForm] = useState(defaultFields);
+  const [status, setStatus] = useState({ error: '', message: '', strength: 0 });
 
-  const handleExpertiseChange = (e) => {
-    const value = e.target.value;
-    setExpertise(
-      expertise.includes(value)
-        ? expertise.filter((item) => item !== value)
-        : [...expertise, value]
-    );
-  };
-  const handleConcernsChange = (e) => {
-    const value = e.target.value;
-    setConcerns(
-      concerns.includes(value)
-        ? concerns.filter((item) => item !== value)
-        : [...concerns, value]
-    );
-  };
-  const handleFileChange = (e) => {
-    setCredentials(e.target.files[0]);
+  const evaluateStrength = (pwd) => {
+    let s = 0;
+    if (pwd.length >= 8) s++;
+    if (/[a-z]/.test(pwd)) s++;
+    if (/[A-Z]/.test(pwd)) s++;
+    if (/\d/.test(pwd)) s++;
+    if (/[^A-Za-z0-9]/.test(pwd)) s++;
+    return s;
   };
 
-  const handleSubmit = async (e) => {
+  const toggleSelection = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: prev[field].includes(value)
+        ? prev[field].filter((item) => item !== value)
+        : [...prev[field], value]
+    }));
+  };
+
+  const updateValue = (key, val) => {
+    setForm((f) => ({
+      ...f,
+      [key]: key === 'pass' ? val : val
+    }));
+    if (key === 'pass') {
+      setStatus((s) => ({ ...s, strength: evaluateStrength(val) }));
+    }
+  };
+
+  const submitHandler = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-    if (!email || !password || password !== confirmPassword) {
-      setError('Please fill all required fields and make sure passwords match.');
-      return;
+    setStatus({ error: '', message: '', strength: status.strength });
+
+    if (!form.email || !form.pass || form.pass !== form.confirm) {
+      return setStatus((s) => ({ ...s, error: 'Please fill required fields correctly.' }));
     }
-    if (getPasswordStrength(password) < 3) {
-      setError('Password is too weak.');
-      return;
+    if (evaluateStrength(form.pass) < 3) {
+      return setStatus((s) => ({ ...s, error: 'Your password isn’t strong enough.' }));
     }
-    const formData = new FormData();
-    formData.append('email', email);
-    formData.append('password', password);
-    formData.append('role', role);
-    if (role === 'therapist') {
-      formData.append('licenseNumber', licenseNumber);
-      expertise.forEach((exp) => formData.append('expertise', exp));
-      formData.append('yearsExperience', yearsExperience);
-      formData.append('institution', institution);
-      if (credentials) formData.append('credentials', credentials);
-    } else {
-      formData.append('age', age);
-      formData.append('preferredLanguage', preferredLanguage);
-      concerns.forEach((c) => formData.append('concerns', c));
-      formData.append('communicationMode', communicationMode);
-    }
+
+    const payload = new FormData();
+    Object.entries(form).forEach(([key, val]) => {
+      if (Array.isArray(val)) val.forEach((v) => payload.append(key, v));
+      else if (val) payload.append(key, val);
+    });
+
     try {
       const res = await fetch('http://localhost:5000/api/signup', {
         method: 'POST',
-        body: formData,
+        body: payload
       });
+      const data = await res.json();
       if (res.ok) {
-        setSuccess('Registration successful! You can now sign in.');
-        setTimeout(() => { if (onBack) onBack(); }, 1500);
+        setStatus({ error: '', message: 'Successfully registered!', strength: 0 });
+        setTimeout(() => onSwitch && onSwitch(), 1000);
       } else {
-        const data = await res.json();
-        setError(data.error || 'Registration failed');
+        setStatus((s) => ({ ...s, error: data.error || 'Signup failed' }));
       }
-    } catch (err) {
-      setError('Server error');
+    } catch {
+      setStatus((s) => ({ ...s, error: 'Server issue. Try again later.' }));
     }
   };
 
   return (
-    <div className="signup-responsive-container">
-      <form className="signup-responsive-form" onSubmit={handleSubmit}>
-        <h2 className="signup-title">Sign Up</h2>
-        <div className="signup-role-row">
-          <label>
-            <input
-              type="radio"
-              value="client"
-              checked={role === 'client'}
-              onChange={() => setRole('client')}
-            />
-            Client
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="therapist"
-              checked={role === 'therapist'}
-              onChange={() => setRole('therapist')}
-            />
-            Therapist
-          </label>
+    <div className="register-wrapper">
+      <form className="register-form" onSubmit={submitHandler}>
+        <h1 style={{ marginBottom: '1.5rem' }}>Create Account</h1>
+        <div className="role-selector" style={{ marginBottom: '1.2rem', display: 'flex', gap: '1.5rem' }}>
+          {['client', 'therapist'].map((r) => (
+            <label key={r} style={{ fontWeight: 500 }}>
+              <input
+                type="radio"
+                value={r}
+                checked={form.user === r}
+                onChange={() => updateValue('user', r)}
+                style={{ marginRight: '0.5rem' }}
+              />
+              {r.charAt(0).toUpperCase() + r.slice(1)}
+            </label>
+          ))}
         </div>
-        <div className="signup-shared-fields">
+
+        <div className="input-group" style={{ marginBottom: '1rem' }}>
           <input
             type="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={form.email}
+            onChange={(e) => updateValue('email', e.target.value)}
             required
-            className="signup-input"
           />
+        </div>
+
+        <div className="input-group" style={{ marginBottom: '1rem' }}>
           <input
             type="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setPasswordStrength(getPasswordStrength(e.target.value));
-            }}
-            minLength={8}
-            maxLength={32}
+            value={form.pass}
+            onChange={(e) => updateValue('pass', e.target.value)}
             required
-            className="signup-input"
           />
-          <div className="password-strength">
-            Password Strength: {['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'][passwordStrength]}
-          </div>
+        </div>
+
+        <div style={{ marginBottom: '1rem', color: '#0077b6', fontWeight: 500 }}>
+          Password Strength: {['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'][status.strength]}
+        </div>
+
+        <div className="input-group" style={{ marginBottom: '1rem' }}>
           <input
             type="password"
             placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={form.confirm}
+            onChange={(e) => updateValue('confirm', e.target.value)}
             required
-            className="signup-input"
           />
         </div>
-        <div className="signup-role-sections">
-          {role === 'therapist' && (
-            <div className="signup-role-box">
+
+        {form.user === 'therapist' ? (
+          <>
+            <div className="input-group" style={{ marginBottom: '1rem' }}>
               <input
                 type="text"
-                placeholder="License/Registration Number"
-                value={licenseNumber}
-                onChange={(e) => setLicenseNumber(e.target.value)}
+                placeholder="License Number"
+                value={form.licenseId}
+                onChange={(e) => updateValue('licenseId', e.target.value)}
                 required
-                className="signup-input"
               />
-              <label className="signup-label">Area of Expertise:</label>
-              <div className="tags-container">
-                {expertiseOptions.map((option) => (
-                  <label key={option} className={`tag ${expertise.includes(option) ? 'selected' : ''}`}>
+            </div>
+            <div className="checkbox-group" style={{ marginBottom: '1rem' }}>
+              <label style={{ marginBottom: '0.5rem', fontWeight: 500 }}>Expertise</label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                {options.specialties.map((item) => (
+                  <label key={item} style={{ fontWeight: 400 }}>
                     <input
                       type="checkbox"
-                      value={option}
-                      checked={expertise.includes(option)}
-                      onChange={handleExpertiseChange}
+                      value={item}
+                      checked={form.focusAreas.includes(item)}
+                      onChange={() => toggleSelection('focusAreas', item)}
+                      style={{ marginRight: '0.4rem' }}
                     />
-                    {option}
+                    {item}
                   </label>
                 ))}
               </div>
+            </div>
+            <div className="input-group" style={{ marginBottom: '1rem' }}>
               <input
                 type="number"
                 placeholder="Years of Experience"
-                value={yearsExperience}
-                onChange={(e) => setYearsExperience(e.target.value)}
-                min="0"
+                value={form.experience}
+                onChange={(e) => updateValue('experience', e.target.value)}
                 required
-                className="signup-input"
               />
+            </div>
+            <div className="input-group" style={{ marginBottom: '1rem' }}>
               <input
                 type="text"
-                placeholder="Affiliated Institution (optional)"
-                value={institution}
-                onChange={(e) => setInstitution(e.target.value)}
-                className="signup-input"
+                placeholder="Institution (optional)"
+                value={form.institution}
+                onChange={(e) => updateValue('institution', e.target.value)}
               />
-              <label className="signup-label">Upload Credentials (PDF or image):</label>
-              <input type="file" accept=".pdf,image/*" onChange={handleFileChange} className="signup-input-file" />
             </div>
-          )}
-          {role === 'client' && (
-            <div className="signup-role-box">
+            <label style={{ marginBottom: '1rem', fontWeight: 500 }}>
+              Upload Credentials:
+              <input type="file" accept=".pdf,image/*" onChange={(e) => updateValue('credentialFile', e.target.files[0])} style={{ marginLeft: '0.5rem' }} />
+            </label>
+          </>
+        ) : (
+          <>
+            <div className="input-group" style={{ marginBottom: '1rem' }}>
               <input
                 type="number"
                 placeholder="Age"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                min="1"
+                value={form.age}
+                onChange={(e) => updateValue('age', e.target.value)}
                 required
-                className="signup-input"
               />
+            </div>
+            <div className="input-group" style={{ marginBottom: '1rem' }}>
               <input
                 type="text"
                 placeholder="Preferred Language"
-                value={preferredLanguage}
-                onChange={(e) => setPreferredLanguage(e.target.value)}
+                value={form.language}
+                onChange={(e) => updateValue('language', e.target.value)}
                 required
-                className="signup-input"
               />
-              <label className="signup-label">Mental Health Concerns:</label>
-              <div className="tags-container">
-                {concernsOptions.map((option) => (
-                  <label key={option} className={`tag ${concerns.includes(option) ? 'selected' : ''}`}>
+            </div>
+            <div className="checkbox-group" style={{ marginBottom: '1rem' }}>
+              <label style={{ marginBottom: '0.5rem', fontWeight: 500 }}>Concerns</label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                {options.concerns.map((item) => (
+                  <label key={item} style={{ fontWeight: 400 }}>
                     <input
                       type="checkbox"
-                      value={option}
-                      checked={concerns.includes(option)}
-                      onChange={handleConcernsChange}
+                      value={item}
+                      checked={form.issues.includes(item)}
+                      onChange={() => toggleSelection('issues', item)}
+                      style={{ marginRight: '0.4rem' }}
                     />
-                    {option}
+                    {item}
                   </label>
                 ))}
               </div>
-              <label className="signup-label">Preferred Communication Mode:</label>
-              <select value={communicationMode} onChange={(e) => setCommunicationMode(e.target.value)} required className="signup-input">
-                <option value="">Select</option>
-                {communicationModes.map((m) => (
+            </div>
+            <div className="input-group" style={{ marginBottom: '1.2rem' }}>
+              <select
+                value={form.mode}
+                onChange={(e) => updateValue('mode', e.target.value)}
+                required
+                style={{ padding: '0.6rem 0.8rem', borderRadius: '6px', border: '1.5px solid #b3c6e0', fontSize: '1rem' }}
+              >
+                <option value="">Select Communication Mode</option>
+                {options.modes.map((m) => (
                   <option key={m} value={m}>{m}</option>
                 ))}
               </select>
             </div>
-          )}
-        </div>
-        {error && (<div className="error-message">{error}</div>)}
-        {success && (<div className="success-message">{success}</div>)}
-        <div className="signup-btn-row">
-          <button type="button" className="signup-btn secondary" onClick={onBack}>Back to Sign In</button>
-          <button type="submit" className="signup-btn primary">Register</button>
+          </>
+        )}
+
+        {status.error && <p className="error-msg" style={{ color: 'red', marginBottom: '1rem' }}>{status.error}</p>}
+        {status.message && <p className="success-msg" style={{ color: 'green', marginBottom: '1rem' }}>{status.message}</p>}
+
+        <div className="button-stack">
+          <div className="register-row">
+            <button type="submit" className="dark-btn">Register</button>
+            <button type="button" className="register-link" onClick={onSwitch}>Back to Login</button>
+          </div>
         </div>
       </form>
     </div>
   );
 };
 
-export default SignUp;
+export default RegisterForm;

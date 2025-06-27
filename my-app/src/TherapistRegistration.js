@@ -157,23 +157,7 @@ const TherapistRegistration = ({ onBack }) => {
           <input
             type="text"
             placeholder="Affiliated Institution (optional)"
-            value={institution}
-            onChange={(e) => setInstitution(e.target.value)}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            aria-label="Affiliated Institution"
-          />
-        </div>
-        {showUpload && (
-          <div className="input-group fade-in">
-            <label>Upload Credentials (PDF or image):</label>
-            <input type="file" accept=".pdf,image/*" onChange={handleFileChange} aria-label="Upload Credentials" />
-            <span className="tooltip">We never share your data</span>
-          </div>
-        )}
-        <button type="submit" className="animated-btn" style={{marginBottom:'10px'}}>Register</button>
-        <button type="button" className="animated-btn" onClick={onBack}>Back to Sign In</button>
-        {error && <div className="error">{error}</div>}
+
       </form>
     </div>
   );

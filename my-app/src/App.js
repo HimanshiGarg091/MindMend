@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import "./App.css";
 import ladyImage from './lady.jpg';
 import MoodTracker from "./MoodTracker";
-
-
 import TherapistForm from "./TherapistForm";
-
+import Modal from "./Modal";
+import SelfHelpResources from "./SelfHelpResources";
+import CommunityChat from "./CommunityChat";
+import SignIn from "./SignIn";
+import SignUp from "./SignUp";
 
 function App() {
   const [showForm, setShowForm] = useState(false);
@@ -15,16 +17,42 @@ function App() {
   const [showClientReg, setShowClientReg] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const [signUpRole, setSignUpRole] = useState('Client');
+  const [showSelfHelp, setShowSelfHelp] = useState(false);
+  const [showCommunityChat, setShowCommunityChat] = useState(false);
 
   const openForm = () => setShowForm(true);
   const closeForm = () => setShowForm(false);
   const openMood = () => setShowMood(true);
   const closeMood = () => setShowMood(false);
+  const openSelfHelp = () => setShowSelfHelp(true);
+  const closeSelfHelp = () => setShowSelfHelp(false);
+  const openCommunityChat = () => setShowCommunityChat(true);
+  const closeCommunityChat = () => setShowCommunityChat(false);
 
   return (
-    <div className="full-width-section">z
+    <div className="full-width-section">
     {showForm && <TherapistForm onClose={closeForm} />}
     {showMood && <MoodTracker onClose={closeMood} />}
+    {showSignIn && (
+      <Modal onClose={() => setShowSignIn(false)}>
+        <SignIn
+          onSignIn={() => setShowSignIn(false)}
+          onShowSignUp={() => {
+            setShowSignIn(false);
+            setShowSignUp(true);
+          }}
+          isNewUser={showSignUp}
+        />
+      </Modal>
+    )}
+    {showSignUp && (
+      <Modal onClose={() => setShowSignUp(false)}>
+        <SignUp onSignUp={() => {
+          setShowSignUp(false);
+          setShowSignIn(true);
+        }} />
+      </Modal>
+    )}
 
       <nav className="navbar">
         <div className="logo">MindMend</div>
@@ -76,21 +104,20 @@ function App() {
           </div>
 
           <div className="feature-item">
-  <span role="img" aria-label="Self-Help Resources" className="icon">
-    📖
-  </span>
-  <p>
-    <button className="get-started-btn" onClick={openSelfHelp}>
-      Self-Help Resources
-    </button>
-  </p>
-  {showSelfHelp && (
-    <Modal onClose={closeSelfHelp}>
-      <SelfHelpResources />
-    </Modal>
-  )}
-    
-</div>
+            <span role="img" aria-label="Self-Help Resources" className="icon">
+              📖
+            </span>
+            <p>
+              <button className="get-started-btn" onClick={openSelfHelp}>
+                Self-Help Resources
+              </button>
+            </p>
+            {showSelfHelp && (
+              <Modal onClose={closeSelfHelp}>
+                <SelfHelpResources />
+              </Modal>
+            )}
+          </div>
 
 
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './SignIn.css';
 
-const SignIn = ({ onSignIn, onShowSignUp }) => {
+const SignIn = ({ onSignIn, onShowSignUp, isNewUser }) => {
   const [userType, setUserType] = useState('Client');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -43,7 +43,19 @@ const SignIn = ({ onSignIn, onShowSignUp }) => {
     <div className="signin-container">
       <form className="signin-form" onSubmit={handleSubmit}>
         <h2>Sign In</h2>
-        <div className="user-type">
+        {isNewUser && (
+          <div
+            className="new-user-message"
+            style={{
+              color: '#0077b6',
+              marginBottom: '1rem',
+              fontWeight: 'bold',
+            }}
+          >
+            Welcome! Please sign in with your new account.
+          </div>
+        )}
+        <div className="user-type-row">
           <label>
             <input
               type="radio"
@@ -63,34 +75,44 @@ const SignIn = ({ onSignIn, onShowSignUp }) => {
             Therapist
           </label>
         </div>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <div className="input-group">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="username"
+          />
+        </div>
+        <div className="input-group">
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+          />
+        </div>
         {error && <div className="error">{error}</div>}
-        <button type="submit">Sign In</button>
-        <div className="forgot">Forgot password?</div>
-        <div className="signup-link">
-          New user?{' '}
-          <span
-            onClick={onShowSignUp}
-            style={{
-              color: '#0077b6',
-              cursor: 'pointer',
-              textDecoration: 'underline',
-            }}
-          >
-            Sign Up
+        <button type="submit" className="submit-btn">Sign In</button>
+        <div className="form-links-row">
+          <span className="forgot" tabIndex={0} role="link">Forgot password?</span>
+          <span className="signup-link">
+            New user?{' '}
+            <span
+              onClick={onShowSignUp}
+              style={{ color: '#0077b6', cursor: 'pointer', textDecoration: 'underline' }}
+              tabIndex={0}
+              role="link"
+            >
+              Sign Up
+            </span>
           </span>
         </div>
       </form>
