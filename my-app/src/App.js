@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import "./App.css";
 import ladyImage from './lady.jpg';
 import MoodTracker from "./MoodTracker";
+
+
 import TherapistForm from "./TherapistForm";
-import SignIn from "./SignIn";
-import SignUp from "./SignUp";
+
 
 function App() {
   const [showForm, setShowForm] = useState(false);
@@ -19,25 +20,12 @@ function App() {
   const closeForm = () => setShowForm(false);
   const openMood = () => setShowMood(true);
   const closeMood = () => setShowMood(false);
-  const handleSignIn = (userType) => {
-    setShowSignIn(false);
-    if (userType === "Therapist") {
-      setShowTherapistReg(true);
-    } else {
-      setShowClientReg(true);
-    }
-  };
-  const handleShowSignUp = () => {
-    setShowSignIn(false);
-    setShowSignUp(true);
-  };
 
   return (
-    <div className="full-width-section">
-      {showForm && <TherapistForm onClose={closeForm} />}
-      {showMood && <MoodTracker onClose={closeMood} />}
-      {showSignIn && <SignIn onSignIn={handleSignIn} onShowSignUp={handleShowSignUp} />}
-      {showSignUp && <SignUp onBack={() => { setShowSignUp(false); setShowSignIn(true); }} />}
+    <div className="full-width-section">z
+    {showForm && <TherapistForm onClose={closeForm} />}
+    {showMood && <MoodTracker onClose={closeMood} />}
+
       <nav className="navbar">
         <div className="logo">MindMend</div>
         <ul className="nav-links">
@@ -76,7 +64,7 @@ function App() {
             <span role="img" aria-label="Online Therapy" className="icon">
               💻
             </span>
-            <p>Online Therapy</p>
+            <p> <button className="get-started-btn" onClick={openForm}>Online Therapy</button></p>
           </div>
           <div className="feature-item">
             <span role="img" aria-label="Mood Tracking" className="icon">
@@ -86,18 +74,45 @@ function App() {
   Mood Tracking
 </button></p>
           </div>
+
           <div className="feature-item">
-            <span role="img" aria-label="Self-Help Resources" className="icon">
-              📖
-            </span>
-            <p>Self-Help Resources</p>
-          </div>
-          <div className="feature-item">
-            <span role="img" aria-label="Community Support" className="icon">
-              👥
-            </span>
-            <p>Community Support</p>
-          </div>
+  <span role="img" aria-label="Self-Help Resources" className="icon">
+    📖
+  </span>
+  <p>
+    <button className="get-started-btn" onClick={openSelfHelp}>
+      Self-Help Resources
+    </button>
+  </p>
+  {showSelfHelp && (
+    <Modal onClose={closeSelfHelp}>
+      <SelfHelpResources />
+    </Modal>
+  )}
+    
+</div>
+
+
+
+<div className="feature-item">
+  <span role="img" aria-label="Community Support" className="icon">
+    👥
+  </span>
+  <button
+    className="get-started-btn"
+    onClick={openCommunityChat}
+    style={{ marginTop: "10px" }}
+  >
+    Community Support
+  </button>
+  {showCommunityChat && (
+    <Modal onClose={closeCommunityChat}>
+      <h2>Community Chat</h2>
+      <CommunityChat />
+    </Modal>
+  )}
+</div>
+
         </div>
       </section>
     </div>
