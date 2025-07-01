@@ -188,10 +188,10 @@ const RegisterForm = ({ onSwitch }) => {
                 onChange={(e) => updateValue('institution', e.target.value)}
               />
             </div>
-            <label style={{ marginBottom: '1rem', fontWeight: 500 }}>
+            {/* <label style={{ marginBottom: '1rem', fontWeight: 500 }}>
               Upload Credentials:
               <input type="file" accept=".pdf,image/*" onChange={(e) => updateValue('credentialFile', e.target.files[0])} style={{ marginLeft: '0.5rem' }} />
-            </label>
+            </label> */}
           </>
         ) : (
           <>

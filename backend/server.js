@@ -6,14 +6,16 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const uri="mongodb+srv://garghimanshi093:mindMend@cluster0.mafkrsd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 require('dotenv').config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/therapyApp';
+const MONGO_URI = process.env.MONGO_URI || uri
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use("/api/mood", require("./routes/mood"));
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, 'uploads');
