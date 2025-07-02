@@ -10,24 +10,36 @@ const SignIn = ({ onSignIn, onShowSignUp, isNewUser }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
     if (!email || !password) {
       setError('Please enter both email and password.');
       return;
     }
+
     try {
       const res = await fetch('http://localhost:5000/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
+
       const data = await res.json();
+
       if (res.ok) {
-        // Check role match
+        // ✅ Check if user role matches
         if (
           (userType === 'Therapist' && data.role === 'therapist') ||
           (userType === 'Client' && data.role === 'client')
         ) {
-          window.location.href = '/'; // Redirect to home page
+          // ✅ Save token to localStorage
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('userType', data.role);
+
+          // ✅ Optional: Pass token to parent component
+          if (onSignIn) onSignIn(data);
+
+          // ✅ Redirect to dashboard/home
+          window.location.href = '/';
         } else {
           setError('Role does not match. Please select the correct role.');
         }
@@ -35,6 +47,7 @@ const SignIn = ({ onSignIn, onShowSignUp, isNewUser }) => {
         setError(data.error || 'Invalid credentials');
       }
     } catch (err) {
+      console.error('Login Error:', err);
       setError('Server error');
     }
   };
@@ -55,6 +68,7 @@ const SignIn = ({ onSignIn, onShowSignUp, isNewUser }) => {
             Welcome! Please sign in with your new account.
           </div>
         )}
+
         <div className="user-type-row">
           <label>
             <input
@@ -75,6 +89,7 @@ const SignIn = ({ onSignIn, onShowSignUp, isNewUser }) => {
             Therapist
           </label>
         </div>
+
         <div className="input-group">
           <label htmlFor="email">Email</label>
           <input
@@ -87,6 +102,7 @@ const SignIn = ({ onSignIn, onShowSignUp, isNewUser }) => {
             autoComplete="username"
           />
         </div>
+
         <div className="input-group">
           <label htmlFor="password">Password</label>
           <input
@@ -99,8 +115,11 @@ const SignIn = ({ onSignIn, onShowSignUp, isNewUser }) => {
             autoComplete="current-password"
           />
         </div>
+
         {error && <div className="error">{error}</div>}
+
         <button type="submit" className="submit-btn">Sign In</button>
+
         <div className="form-links-row">
           <span className="forgot" tabIndex={0} role="link">Forgot password?</span>
           <span className="signup-link">

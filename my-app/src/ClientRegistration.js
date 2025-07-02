@@ -47,16 +47,27 @@ const ClientRegistration = ({ onBack }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
     if (!email || !password || password !== confirmPassword || !age || !language || concerns.length === 0 || !mode) {
       setError('Please fill all required fields and make sure passwords match.');
       return;
     }
+
     try {
-      const res = await fetch('http://localhost:5000/api/client', {
+      const res = await fetch('http://localhost:5000/api/signup', { // ✅ Correct endpoint
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, age, language, concerns, mode }),
+        body: JSON.stringify({
+          email,
+          password,
+          role: 'client', // ✅ Role added
+          age,
+          preferredLanguage: language, // ✅ Correct field name
+          concerns,
+          communicationMode: mode // ✅ Correct field name
+        }),
       });
+
       if (res.ok) {
         alert('Client registered successfully!');
         if (onBack) onBack();
@@ -65,6 +76,7 @@ const ClientRegistration = ({ onBack }) => {
         setError(data.error || 'Registration failed');
       }
     } catch (err) {
+      console.error('Client Registration Error:', err);
       setError('Server error');
     }
   };
@@ -155,7 +167,7 @@ const ClientRegistration = ({ onBack }) => {
             ))}
           </select>
         </div>
-        <button type="button" className="animated-btn" onClick={onBack} style={{marginBottom:'10px'}}>Back to Sign In</button>
+        <button type="button" className="animated-btn" onClick={onBack} style={{ marginBottom: '10px' }}>Back to Sign In</button>
         <button type="submit" className="animated-btn">Register</button>
         {error && <div className="error">{error}</div>}
       </form>

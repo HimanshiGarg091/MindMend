@@ -14,6 +14,9 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/therapyApp
 const app = express();
 app.use(cors());
 app.use(express.json());
+const chatRoutes = require('./routes/chat');
+app.use('/api/chat', chatRoutes);
+
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -140,6 +143,40 @@ app.post('/api/login', async (req, res) => {
 app.get('/api/profile', authenticateToken, (req, res) => {
   res.json({ message: 'Profile data', user: req.user });
 });
+
+// Chatbot Route - OpenAI Integration
+const axios = require('axios');
+
+app.post('/api/chat', authenticateToken, async (req, res) => {
+  const { message } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ error: 'Message is required' });
+  }
+
+  try {
+    const response = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        model: 'gpt-3.5-turbo',
+        messages: [{ role: 'user', content: message }],
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, // Make sure to set this in your .env
+        },
+      }
+    );
+
+    const botReply = response.data.choices[0].message.content.trim();
+    res.json({ reply: botReply });
+  } catch (err) {
+    console.error('Chatbot error:', err.message);
+    res.status(500).json({ error: 'Failed to connect to AI.' });
+  }
+});
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

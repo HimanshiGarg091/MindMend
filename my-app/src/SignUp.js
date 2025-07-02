@@ -46,11 +46,13 @@ const RegisterForm = ({ onSwitch }) => {
     }));
   };
 
+  // ✅ Fully corrected updateValue
   const updateValue = (key, val) => {
     setForm((f) => ({
       ...f,
-      [key]: key === 'pass' ? val : val
+      [key]: val
     }));
+
     if (key === 'pass') {
       setStatus((s) => ({ ...s, strength: evaluateStrength(val) }));
     }
@@ -68,10 +70,25 @@ const RegisterForm = ({ onSwitch }) => {
     }
 
     const payload = new FormData();
-    Object.entries(form).forEach(([key, val]) => {
-      if (Array.isArray(val)) val.forEach((v) => payload.append(key, v));
-      else if (val) payload.append(key, val);
-    });
+    payload.append('email', form.email);
+    payload.append('password', form.pass);
+    payload.append('role', form.user);
+
+    if (form.user === 'therapist') {
+      payload.append('licenseNumber', form.licenseId);
+      form.focusAreas.forEach((area) => payload.append('expertise', area));
+      payload.append('yearsExperience', form.experience);
+      if (form.institution) payload.append('institution', form.institution);
+      if (form.credentialFile) payload.append('credentials', form.credentialFile);
+    } else {
+      payload.append('age', form.age);
+      payload.append('preferredLanguage', form.language);
+      form.issues.forEach((issue) => payload.append('concerns', issue));
+      payload.append('communicationMode', form.mode);
+    }
+
+    console.log('Form Data:', form); // ✅ Debugging line
+    console.log('File in form:', form.credentialFile); // ✅ Debugging line
 
     try {
       const res = await fetch('http://localhost:5000/api/signup', {
@@ -190,7 +207,12 @@ const RegisterForm = ({ onSwitch }) => {
             </div>
             <label style={{ marginBottom: '1rem', fontWeight: 500 }}>
               Upload Credentials:
-              <input type="file" accept=".pdf,image/*" onChange={(e) => updateValue('credentialFile', e.target.files[0])} style={{ marginLeft: '0.5rem' }} />
+              <input
+                type="file"
+                accept=".pdf,image/*"
+                onChange={(e) => updateValue('credentialFile', e.target.files[0])}
+                style={{ marginLeft: '0.5rem' }}
+              />
             </label>
           </>
         ) : (
