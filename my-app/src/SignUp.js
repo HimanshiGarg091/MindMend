@@ -56,39 +56,88 @@ const RegisterForm = ({ onSwitch }) => {
     }
   };
 
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    setStatus({ error: '', message: '', strength: status.strength });
+  // const submitHandler = async (e) => {
+  //   e.preventDefault();
+  //   setStatus({ error: '', message: '', strength: status.strength });
 
-    if (!form.email || !form.pass || form.pass !== form.confirm) {
-      return setStatus((s) => ({ ...s, error: 'Please fill required fields correctly.' }));
-    }
-    if (evaluateStrength(form.pass) < 3) {
-      return setStatus((s) => ({ ...s, error: 'Your password isn’t strong enough.' }));
-    }
+  //   if (!form.email || !form.pass || form.pass !== form.confirm) {
+  //     return setStatus((s) => ({ ...s, error: 'Please fill required fields correctly.' }));
+  //   }
+  //   if (evaluateStrength(form.pass) < 3) {
+  //     return setStatus((s) => ({ ...s, error: 'Your password isn’t strong enough.' }));
+  //   }
 
-    const payload = new FormData();
-    Object.entries(form).forEach(([key, val]) => {
-      if (Array.isArray(val)) val.forEach((v) => payload.append(key, v));
-      else if (val) payload.append(key, val);
+  //   const payload = new FormData();
+  //   Object.entries(form).forEach(([key, val]) => {
+  //     if (Array.isArray(val)) val.forEach((v) => payload.append(key, v));
+  //     else if (val) payload.append(key, val);
+  //   });
+
+  //   try {
+  //     const res = await fetch('http://localhost:5000/api/signup', {
+  //       method: 'POST',
+  //       body: payload
+  //     });
+  //     const data = await res.json();
+  //     if (res.ok) {
+  //       setStatus({ error: '', message: 'Successfully registered!', strength: 0 });
+  //       setTimeout(() => onSwitch && onSwitch(), 1000);
+  //     } else {
+  //       setStatus((s) => ({ ...s, error: data.error || 'Signup failed' }));
+  //     }
+  //   } catch {
+  //     setStatus((s) => ({ ...s, error: 'Server issue. Try again later.' }));
+  //   }
+  // };
+  // ...existing code...
+
+const submitHandler = async (e) => {
+  e.preventDefault();
+  setStatus({ error: '', message: '', strength: status.strength });
+
+  if (!form.email || !form.pass || form.pass !== form.confirm) {
+    return setStatus((s) => ({ ...s, error: 'Please fill required fields correctly.' }));
+  }
+  if (evaluateStrength(form.pass) < 3) {
+    return setStatus((s) => ({ ...s, error: 'Your password isn’t strong enough.' }));
+  }
+
+  const payload = new FormData();
+  // Map frontend fields to backend expectations
+  payload.append('email', form.email);
+  payload.append('password', form.pass); // backend expects 'password'
+  payload.append('role', form.user);     // backend expects 'role'
+
+  if (form.user === 'therapist') {
+    payload.append('license', form.licenseId);
+    form.focusAreas.forEach((v) => payload.append('expertise', v));
+    payload.append('years', form.experience);
+    payload.append('institution', form.institution);
+    // if (form.credentialFile) payload.append('credentials', form.credentialFile);
+  } else {
+    payload.append('age', form.age);
+    payload.append('language', form.language);
+    form.issues.forEach((v) => payload.append('concerns', v));
+    payload.append('mode', form.mode);
+  }
+
+  try {
+    const res = await fetch('http://localhost:5000/api/signup', {
+      method: 'POST',
+      body: payload
     });
-
-    try {
-      const res = await fetch('http://localhost:5000/api/signup', {
-        method: 'POST',
-        body: payload
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setStatus({ error: '', message: 'Successfully registered!', strength: 0 });
-        setTimeout(() => onSwitch && onSwitch(), 1000);
-      } else {
-        setStatus((s) => ({ ...s, error: data.error || 'Signup failed' }));
-      }
-    } catch {
-      setStatus((s) => ({ ...s, error: 'Server issue. Try again later.' }));
+    const data = await res.json();
+    if (res.ok) {
+      setStatus({ error: '', message: 'Successfully registered!', strength: 0 });
+      setTimeout(() => onSwitch && onSwitch(), 1000);
+    } else {
+      setStatus((s) => ({ ...s, error: data.error || 'Signup failed' }));
     }
-  };
+  } catch {
+    setStatus((s) => ({ ...s, error: 'Server issue. Try again later.' }));
+  }
+};
+// ...existing code...
 
   return (
     <div className="register-wrapper">
@@ -188,10 +237,10 @@ const RegisterForm = ({ onSwitch }) => {
                 onChange={(e) => updateValue('institution', e.target.value)}
               />
             </div>
-            {/* <label style={{ marginBottom: '1rem', fontWeight: 500 }}>
+            <label style={{ marginBottom: '1rem', fontWeight: 500 }}>
               Upload Credentials:
               <input type="file" accept=".pdf,image/*" onChange={(e) => updateValue('credentialFile', e.target.files[0])} style={{ marginLeft: '0.5rem' }} />
-            </label> */}
+            </label>
           </>
         ) : (
           <>

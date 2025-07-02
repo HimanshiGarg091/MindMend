@@ -6,11 +6,11 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
-const uri="mongodb+srv://garghimanshi093:mindMend@cluster0.mafkrsd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
 require('dotenv').config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
-const MONGO_URI = process.env.MONGO_URI || uri
+const MONGO_URI = process.env.MONGO_URI 
 
 const app = express();
 app.use(cors());
