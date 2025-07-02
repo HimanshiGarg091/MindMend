@@ -1,0 +1,53 @@
+.mood-popup {
+    display: flex;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.25);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.mood-container {
+    background: #fff;
+    padding: 28px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    min-width: 280px;
+    text-align: center;
+}
+.mood-list {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin: 20px 0;
+}
+.mood-btn {
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    cursor: pointer;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.1s;
+}
+.mood-btn.selected {
+    transform: scale(1.2);
+    color: #16203a;
+}
+.mood-label {
+    font-size: 1rem;
+    margin-top: 4px;
+    color: #16203a;
+}
+.close-btn {
+    margin-top: 10px;
+    padding: 8px 24px;
+    border: none;
+    background: #16203a;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+}

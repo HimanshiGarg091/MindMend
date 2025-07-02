@@ -1,0 +1,38 @@
+.therapist-card {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(22, 32, 58, 0.07);
+    padding: 18px 24px;
+    margin-bottom: 20px;
+    max-width: 420px;
+    transition: box-shadow 0.2s;
+}
+
+.therapist-card:hover {
+    box-shadow: 0 4px 16px rgba(22, 32, 58, 0.12);
+}
+
+.therapist-photo {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+    border: 2px solid #f5f6fa;
+}
+
+.therapist-info h3 {
+    margin: 0 0 6px 0;
+    color: #16203a;
+    font-size: 1.18rem;
+    font-weight: 600;
+}
+
+.therapist-info p {
+    margin: 0 0 8px 0;
+    color: #6b7280;
+    font-size: 0.98rem;
+}
