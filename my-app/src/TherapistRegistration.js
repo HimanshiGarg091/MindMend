@@ -157,6 +157,19 @@ const TherapistRegistration = ({ onBack }) => {
           <input
             type="text"
             placeholder="Affiliated Institution (optional)"
+            value={institution}
+            onChange={(e) => setInstitution(e.target.value)}
+            aria-label="Affiliated Institution"
+          />
+        </div>
+        {/* <div className="input-group">
+          <input
+          type="file"
+          name="credentials"
+          accept=".pdf,image/*"
+          onChange={handleFileChange}
+          />
+        </div> */}
 
       </form>
     </div>
