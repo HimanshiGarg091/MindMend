@@ -2,23 +2,24 @@
 const express = require("express");
 const router = express.Router();
 const Mood = require("../models/Mood"); // Your Mongoose model
+const TEST_USER_ID = "testuserid123"; // Use any string or a real ObjectId from your DB
 
 // POST /api/mood
 router.post("/", async (req, res) => {
   const { mood, note } = req.body;
-  await Mood.create({ user: req.user.id, moodValue: Number(mood), note, date: new Date() });
+  await Mood.create({ user: /*req.user.id*/TEST_USER_ID, moodValue: Number(mood), note, date: new Date() });
   res.json({ success: true });
 });
 
 // GET /api/mood/history
 router.get("/history", async (req, res) => {
-  const history = await Mood.find({ user: req.user.id }).sort({ date: 1 });
+  const history = await Mood.find({ user: /*req.user.id*/TEST_USER_ID }).sort({ date: 1 });
   res.json(history);
 });
 
 // GET /api/mood/streak
 router.get("/streak", async (req, res) => {
-  const moods = await Mood.find({ user: req.user.id }).sort({ date: -1 });
+  const moods = await Mood.find({ user: /*req.user.id*/TEST_USER_ID }).sort({ date: -1 });
   let streak = 0;
   let prev = null;
   for (let m of moods) {
